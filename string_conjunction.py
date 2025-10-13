@@ -1,60 +1,48 @@
 SIZE = 8
 
-inPromptTemplate = "Введите {N}-ую строку\n"
-outPromptTemplate = "{N}-ая строка (с нулями)"
-outPromptRes = "Результат"
+class BitString:
+    def __init__(self, input_string=""):
+        self.bs = ['0'] * SIZE
+        if input_string:
+            self.from_string(input_string)
 
-def input_string(n: int) -> str:
-    prompt = inPromptTemplate.format(N=n)
-    print(prompt, end="")
-    return input()
+    def from_string(self, input_string: str):
+        if len(input_string) > SIZE:
+            print(f"Длина строки не должна превышать {SIZE} символов!")
+            return
+        for char in input_string:
+            if char not in ('0', '1'):
+                print("Строка должна содержать только '0' и '1'.")
+                return
+        self.bs = list(input_string.ljust(SIZE, '0')[:SIZE])
 
-def check_string(str_to_check: str) -> bool:
-    if len(str_to_check) > SIZE:
-        print(f"Длина строки не должна превышать {SIZE} символов!\n")
-        return False
-    for char in str_to_check:
-        if char not in ('0', '1'):
-            print("Строка должна содержать только '0' и '1'.\n")
-            return False
-    return True
+    def input(self, n: int):
+        prompt = f"Введите {n}-ю строку: "
+        print(prompt, end="")
+        user_input = input()
+        self.from_string(user_input)
 
-def add_zeros(str_to_pad: str) -> str:
-    if len(str_to_pad) < SIZE:
-        print(f"Длина строки менее {SIZE} символов")
-        print("Будет выполнено дополнение незначащими нулями")
-        zeros_to_add = SIZE - len(str_to_pad)
-        zeros = '0' * zeros_to_add
-        return zeros + str_to_pad
-    return str_to_pad
+    def output(self, n: int):
+        prompt_text = f"{n}-я строка (с нулями): "
+        print(prompt_text)
+        print(''.join(self.bs))
 
-def conjunction(str1: str, str2: str) -> str:
-    result = ""
-    for i in range(SIZE):
-        result += '1' if str1[i] == '1' and str2[i] == '1' else '0'
-    return result
+    def conjunction(self, other):
+        result = BitString()
+        for i in range(SIZE):
+            result.bs[i] = '1' if self.bs[i] == '1' and other.bs[i] == '1' else '0'
+        return result
 
-def output_string(str_to_output: str, n: int):
-    prompt_text = outPromptTemplate.format(N=n)
-    print(prompt_text)
-    print(str_to_output)
+def main():
+    a = BitString()
+    b = BitString()
+    a.input(1)
+    b.input(2)
+    c = a.conjunction(b)
+    a.output(1)
+    b.output(2)
+    print("Результат:")
+    c.output(3)
 
-def output_res(res: str):
-    print(f"{outPromptRes}: {res}")
-
-if __name__ == "__main__":   
-    temp1 = input_string(1)
-    while not check_string(temp1):
-        temp1 = input_string(1)
-    str1 = add_zeros(temp1)
-
-    temp2 = input_string(2)
-    while not check_string(temp2):
-        temp2 = input_string(2)
-    str2 = add_zeros(temp2)
-
-    res = conjunction(str1, str2)
-
-    output_string(str1, 1)
-    output_string(str2, 2)
-    output_res(res)
+if __name__ == "__main__":
+    main()
