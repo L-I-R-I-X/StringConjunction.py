@@ -1,64 +1,60 @@
-# Инициализация переменных
 SIZE = 8
-str1 = [''] * (SIZE + 1)  # Символьный массив для первой строки
-str2 = [''] * (SIZE + 1)  # Символьный массив для второй строки
-result = [''] * (SIZE + 1)  # Символьный массив для результата
 
-# Ввод первой строки
-temp1 = input()
+inPromptTemplate = "Введите {N}-ую строку\n"
+outPromptTemplate = "{N}-ая строка (с нулями)"
+outPromptRes = "Результат"
 
-# Проверка длины первой строки
-if len(temp1) > SIZE:
-    print("Строка не должна превышать 8 символов!")
-    exit(1)
+def input_string(n: int) -> str:
+    prompt = inPromptTemplate.format(N=n)
+    print(prompt, end="")
+    return input()
 
-# Проверка символов первой строки
-for char in temp1:
-    if char != '0' and char != '1':
-        print("Строка должна содержать только '0' и '1'.")
-        exit(1)
+def check_string(str_to_check: str) -> bool:
+    if len(str_to_check) > SIZE:
+        print(f"Длина строки не должна превышать {SIZE} символов!\n")
+        return False
+    for char in str_to_check:
+        if char not in ('0', '1'):
+            print("Строка должна содержать только '0' и '1'.\n")
+            return False
+    return True
 
-# Дополнение первой строки нулями
-zeros_to_add = SIZE - len(temp1)
-for i in range(zeros_to_add):
-    str1[i] = '0'
+def add_zeros(str_to_pad: str) -> str:
+    if len(str_to_pad) < SIZE:
+        print(f"Длина строки менее {SIZE} символов")
+        print("Будет выполнено дополнение незначащими нулями")
+        zeros_to_add = SIZE - len(str_to_pad)
+        zeros = '0' * zeros_to_add
+        return zeros + str_to_pad
+    return str_to_pad
 
-for i in range(zeros_to_add, SIZE):
-    str1[i] = temp1[i - zeros_to_add]
+def conjunction(str1: str, str2: str) -> str:
+    result = ""
+    for i in range(SIZE):
+        result += '1' if str1[i] == '1' and str2[i] == '1' else '0'
+    return result
 
-str1[SIZE] = '\0'  # Добавление завершающего нуля
+def output_string(str_to_output: str, n: int):
+    prompt_text = outPromptTemplate.format(N=n)
+    print(prompt_text)
+    print(str_to_output)
 
-# Ввод второй строки
-temp2 = input()
+def output_res(res: str):
+    print(f"{outPromptRes}: {res}")
 
-# Проверка длины второй строки
-if len(temp2) > SIZE:
-    print("Строка не должна превышать 8 символов!")
-    exit(1)
+if __name__ == "__main__":   
+    temp1 = input_string(1)
+    while not check_string(temp1):
+        temp1 = input_string(1)
+    str1 = add_zeros(temp1)
 
-# Проверка символов второй строки
-for char in temp2:
-    if char != '0' and char != '1':
-        print("Строка должна содержать только '0' и '1'.")
-        exit(1)
+    temp2 = input_string(2)
+    while not check_string(temp2):
+        temp2 = input_string(2)
+    str2 = add_zeros(temp2)
 
-# Дополнение второй строки нулями
-zeros_to_add = SIZE - len(temp2)
-for i in range(zeros_to_add):
-    str2[i] = '0'
+    res = conjunction(str1, str2)
 
-for i in range(zeros_to_add, SIZE):
-    str2[i] = temp2[i - zeros_to_add]
-
-str2[SIZE] = '\0'  # Добавление завершающего нуля
-
-# Конъюнкция битовых строк
-for i in range(SIZE):
-    result[i] = '1' if (str1[i] == '1' and str2[i] == '1') else '0'
-
-result[SIZE] = '\0'  # Добавление завершающего нуля
-
-# Вывод результатов
-print("Первая строка (с нулями):", ''.join(str1[:SIZE]))
-print("Вторая строка (с нулями):", ''.join(str2[:SIZE]))
-print("Результат:", ''.join(result[:SIZE]))
+    output_string(str1, 1)
+    output_string(str2, 2)
+    output_res(res)
