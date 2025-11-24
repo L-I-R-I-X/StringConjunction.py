@@ -44,7 +44,14 @@ class BitString:
         
         self.size = new_size
     
-    def set_bit(self, pos: int, value: str):
+    # Перегрузка оператора [] для получения бита
+    def __getitem__(self, pos: int) -> str:
+        if pos < 0 or pos >= self.size:
+            raise BitStringError(f"Ошибка: позиция {pos} вне границ [0, {self.size-1}]")
+        return self.bits[pos]
+    
+    # Перегрузка оператора [] для установки бита
+    def __setitem__(self, pos: int, value: str):
         if pos < 0 or pos >= self.size:
             raise BitStringError(f"Ошибка: позиция {pos} вне границ [0, {self.size-1}]")
         
@@ -53,15 +60,17 @@ class BitString:
             
         self.bits[pos] = value
     
+    def set_bit(self, pos: int, value: str):
+        self[pos] = value
+    
     def get_bit(self, pos: int) -> str:
-        if pos < 0 or pos >= self.size:
-            raise BitStringError(f"Ошибка: позиция {pos} вне границ [0, {self.size-1}]")
-        return self.bits[pos]
+        return self[pos]
     
     def get_size(self) -> int:
         return self.size
     
-    def conjunction(self, other):
+    # Перегрузка оператора & для конъюнкции
+    def __and__(self, other):
         if not isinstance(other, BitString):
             raise BitStringError("Ошибка: параметр должен быть BitString")
             
@@ -73,7 +82,11 @@ class BitString:
         
         return result
     
-    def input(self, n: int):
+    def conjunction(self, other):
+        return self & other
+    
+    # Перегрузка оператора >> для ввода
+    def __rshift__(self, n: int):
         prompt = f"Введите {n}-ю строку: "
         print(prompt, end="")
         user_input = input()
@@ -83,11 +96,20 @@ class BitString:
         except BitStringError as e:
             print(str(e))
             self.bits = ['0'] * self.size
+        return self
     
-    def output(self, n: int):
+    # Перегрузка оператора << для вывода
+    def __lshift__(self, n: int):
         prompt_text = f"{n}-я строка (с нулями): "
         print(prompt_text)
         print(''.join(self.bits))
+        return self
+    
+    def input(self, n: int):
+        self >> n
+    
+    def output(self, n: int):
+        self << n
     
     def __str__(self) -> str:
         return ''.join(self.bits)
