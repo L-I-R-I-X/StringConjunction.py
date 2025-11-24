@@ -1,10 +1,15 @@
 class BitStringError(Exception):
     pass
 
+class Logger:
+    def log(self, message):
+        print(f"LOG: {message}")
+
 class BitString:
     def __init__(self, value=None, size=None):
         self.bits = []
         self.size = 0
+        self.logger = Logger()
         
         if value is None:
             self.size = size if size is not None else 8
@@ -22,7 +27,7 @@ class BitString:
             self.bits = value.bits.copy()
         
     def __del__(self):
-        print("Объект уничтожен")
+        self.logger.log("Объект уничтожен")
     
     def from_string(self, input_string: str) -> bool:
         for char in input_string:
@@ -44,13 +49,11 @@ class BitString:
         
         self.size = new_size
     
-    # Перегрузка оператора [] для получения бита
     def __getitem__(self, pos: int) -> str:
         if pos < 0 or pos >= self.size:
             raise BitStringError(f"Ошибка: позиция {pos} вне границ [0, {self.size-1}]")
         return self.bits[pos]
     
-    # Перегрузка оператора [] для установки бита
     def __setitem__(self, pos: int, value: str):
         if pos < 0 or pos >= self.size:
             raise BitStringError(f"Ошибка: позиция {pos} вне границ [0, {self.size-1}]")
@@ -69,7 +72,6 @@ class BitString:
     def get_size(self) -> int:
         return self.size
     
-    # Перегрузка оператора & для конъюнкции
     def __and__(self, other):
         if not isinstance(other, BitString):
             raise BitStringError("Ошибка: параметр должен быть BitString")
@@ -85,7 +87,6 @@ class BitString:
     def conjunction(self, other):
         return self & other
     
-    # Перегрузка оператора >> для ввода
     def __rshift__(self, n: int):
         prompt = f"Введите {n}-ю строку: "
         print(prompt, end="")
@@ -98,7 +99,6 @@ class BitString:
             self.bits = ['0'] * self.size
         return self
     
-    # Перегрузка оператора << для вывода
     def __lshift__(self, n: int):
         prompt_text = f"{n}-я строка (с нулями): "
         print(prompt_text)
@@ -116,3 +116,21 @@ class BitString:
     
     def __repr__(self) -> str:
         return f"BitString('{''.join(self.bits)}', size={self.size})"
+
+class ExtendedBitString(BitString):
+    def __init__(self, value=None, size=None):
+        super().__init__(value, size)
+        self.logger.log("Создан ExtendedBitString")
+    
+    def __and__(self, other):
+        self.logger.log("Выполняется операция AND между ExtendedBitString")
+        if not isinstance(other, BitString):
+            raise BitStringError("Ошибка: параметр должен быть BitString")
+            
+        min_size = min(self.size, other.size)
+        result = ExtendedBitString(size=min_size)
+        
+        for i in range(min_size):
+            result.bits[i] = '1' if self.bits[i] == '1' and other.bits[i] == '1' else '0'
+        
+        return result

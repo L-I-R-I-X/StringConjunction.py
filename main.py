@@ -1,10 +1,10 @@
-from bitstring import BitString
+from bitstring import ExtendedBitString
 
 SIZE = 8
 
 def main():
-    a = BitString()
-    b = BitString()
+    a = ExtendedBitString()
+    b = ExtendedBitString()
     
     a >> 1
     b >> 2
